@@ -8,7 +8,6 @@ class Settings:
     # Model configuration
     GOOGLE_MODEL = os.getenv("GOOGLE_MODEL", "gemini-2.5-flash")
     TEMPERATURE = float(os.getenv("TEMPERATURE", 0.4))
-    STREAMING = bool(os.getenv("STREAMING", True))
     
     # Path configuration
     CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "shared_chroma_db")

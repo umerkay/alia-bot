@@ -16,7 +16,6 @@ This application uses environment variables for configuration. All paths and set
 ### Google AI Configuration
 - `GOOGLE_MODEL`: Google AI model to use (default: `gemini-2.5-flash`)
 - `TEMPERATURE`: Model temperature for response generation (default: `0.4`)
-- `STREAMING`: Enable streaming responses (default: `true`)
 
 ### Path Configuration
 - `CHROMA_DB_PATH`: Path to Chroma vector database directory (default: `shared_chroma_db`)

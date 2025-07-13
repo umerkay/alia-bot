@@ -53,7 +53,6 @@ Before you begin, ensure you have the following installed:
         GOOGLE_API_KEY=<Your_Google_API_Key>
         GOOGLE_MODEL=gemini-2.0-flash
         TEMPERATURE=0.5
-        STREAMING=True
         
         # Path Configuration (customize as needed)
         CHROMA_DB_PATH=shared_chroma_db
@@ -65,7 +64,6 @@ Before you begin, ensure you have the following installed:
         *   `GOOGLE_MODEL`: Specifies the Gemini model to use (default: `gemini-2.0-flash`).
         *   See `ENVIRONMENT_VARIABLES.md` for a complete list of available configuration options.
         *   `TEMPERATURE`: Controls the randomness of the model's output (default: `0.5`).  Lower values make the output more predictable, higher values make it more creative.
-        *   `STREAMING`: Enables or disables streaming responses from the model (default: `True`).
 
     **Important:**  Never commit your `.env` file to version control.  Add it to your `.gitignore` file.
 
@@ -133,7 +131,6 @@ The application is configured using environment variables.  The following variab
 *   `GOOGLE_API_KEY`:  **Required.**  Your Google API key.
 *   `GOOGLE_MODEL`:  The Gemini model to use (default: `gemini-2.0-flash`).
 *   `TEMPERATURE`: The temperature setting for the model (default: `0.5`).
-*   `STREAMING`:  Whether to enable streaming responses (default: `True`).
 
 ## Deployment
 

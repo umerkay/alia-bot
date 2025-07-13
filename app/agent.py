@@ -30,7 +30,6 @@ def create_initial_clinical_state(messages: List[BaseMessage]) -> ClinicalAgentS
 model = ChatGoogleGenerativeAI(
     model=settings.GOOGLE_MODEL, 
     temperature=settings.TEMPERATURE, 
-    streaming=settings.STREAMING
 )
 
 chat_history_store: Dict[str, List[BaseMessage]] = {}
