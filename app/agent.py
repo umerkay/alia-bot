@@ -3,11 +3,14 @@ from langgraph.prebuilt import create_react_agent
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 from app.config import settings
-from app.services.rag_tool import create_intake_form_retrieval_tool, create_transcript_retrieval_tool
-from app.services.prompts import get_main_agent_prompt, get_transcript_agent_prompt
+from app.services.rag_tool import create_intake_form_retrieval_tool, create_transcript_retrieval_tool, create_assessment_retrieval_tool
+from app.services.graph_rag_tool import create_ehr_retrieval_tool
+from app.services.prompts import get_main_agent_prompt, get_transcript_agent_prompt, get_assessment_agent_prompt
 from typing import Dict, List, TypedDict, Literal
 import datetime
 from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import tool
+
 
 
 # Define the state schema
@@ -41,7 +44,7 @@ agent_executor = None
 def build_main_agent(transcript_context = None):
     """Build the main clinical agent that routes queries"""
     prompt = get_main_agent_prompt(transcript_context)
-    tools = [create_intake_form_retrieval_tool()]
+    tools = [create_intake_form_retrieval_tool(), create_ehr_retrieval_tool(), get_assessment_agent_tool()]
     return create_react_agent(model, tools, prompt=prompt)
 
 def build_transcript_agent():
@@ -54,7 +57,43 @@ def build_transcript_agent():
         return create_react_agent(model, tools, prompt=prompt)
     
     return _build()
-def main_agent_handler(state: ClinicalAgentState, config: RunnableConfig):
+    
+async def build_assessment_agent():
+    """Build the specialized assessment agent"""
+    tools = [create_assessment_retrieval_tool()]
+    prompt = get_assessment_agent_prompt()
+    return create_react_agent(model, tools, prompt=prompt)
+
+_assessment_agent = None
+
+async def get_assessment_agent():
+    global _assessment_agent
+    if _assessment_agent is None:
+        _assessment_agent = await build_assessment_agent()
+    return _assessment_agent
+
+def get_assessment_agent_tool():
+    @tool
+    async def assessment_agent(query: str, config: RunnableConfig) -> str:
+        """Use this tool for assessment-related questions.
+        
+        Args:
+            query (str): The query to ask the assessment agent.
+
+        Returns:
+            str: The response from the assessment agent.
+
+        """
+        print(f"Calling assessment agent with query: {query}")
+        assessment_agent = await get_assessment_agent()
+        response = await assessment_agent.ainvoke({"messages": [HumanMessage(content=query)]}, config=config)
+        last_message = response.get("messages", [])[-1] if response.get("messages") else None
+        return last_message.content.strip() if last_message else "(No response from assessment agent)"
+    
+    return assessment_agent
+
+    
+async def main_agent_handler(state: ClinicalAgentState, config: RunnableConfig):
     transcript_context = state.get("transcript_response", "")
     main_agent = build_main_agent(transcript_context)
     
@@ -63,7 +102,7 @@ def main_agent_handler(state: ClinicalAgentState, config: RunnableConfig):
 
     try:
         print("Invoking main_agent with messages:", messages)
-        response = main_agent.invoke({"messages": messages}, config=config)
+        response = await main_agent.ainvoke({"messages": messages}, config=config)
         last_message = response.get("messages", [])[-1] if response.get("messages") else None
         response_content = last_message.content.strip() if last_message and hasattr(last_message, "content") else ""
     except Exception as e:

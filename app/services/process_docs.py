@@ -87,6 +87,39 @@ async def process_documents(directory: str):
                     print(f"Error processing intake file {file_path}: {e}")
                     continue
             
+            # Process assessments.json files
+            elif filename.lower() == "assessments.json":
+                print(f"Processing assessments: {filename}")
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        assessments_data = json.load(f)
+                    
+                    # Import the function to convert assessments to markdown
+                    from app.services.assessmentToMD import process_assessments_to_markdown
+                    
+                    # Convert each assessment to markdown
+                    assessment_markdowns = process_assessments_to_markdown(assessments_data)
+                    
+                    # Create a separate document for each assessment
+                    for i, markdown_content in enumerate(assessment_markdowns, 1):
+                        doc = Document(
+                            page_content=markdown_content,
+                            metadata={
+                                "source": filename,
+                                "patient_id": patient_id,
+                                "document_type": "assessment",
+                                "assessment_number": i,
+                                "total_assessments": len(assessment_markdowns)
+                            }
+                        )
+                        all_documents.append(doc)
+                    
+                    print(f"Created {len(assessment_markdowns)} assessment documents")
+                    
+                except Exception as e:
+                    print(f"Error processing assessments file {file_path}: {e}")
+                    continue
+            
             # Process .txt files (session transcripts)
             elif file_extension == ".txt":
                 print(f"Processing text file: {filename}")
@@ -123,33 +156,58 @@ async def process_documents(directory: str):
     all_processed_chunks = []
     
     for doc in all_documents:
-        # Split each document individually to maintain proper chunk numbering
-        chunks = splitter.split_documents([doc])
-        total_chunks = len(chunks)
-        
-        # Process each chunk with proper numbering
-        for chunk_num, chunk in enumerate(chunks, 1):
-            # Create specialized header
+        # Check if this is an assessment - assessments should not be chunked
+        if doc.metadata.get("document_type") == "assessment":
+            # For assessments, create header but don't chunk
             header = create_document_header(
-                chunk.metadata["source"],
-                chunk.metadata["patient_id"],
-                chunk_num,
-                total_chunks
+                doc.metadata["source"],
+                doc.metadata["patient_id"],
+                doc.metadata["assessment_number"],
+                doc.metadata["total_assessments"],
+                is_assessment=True
             )
             
             # Prepend header to content
-            new_content = header + chunk.page_content
+            new_content = header + doc.page_content
             
-            # Copy existing metadata and add chunk header info
-            new_metadata = dict(chunk.metadata)
+            # Copy existing metadata and add chunk info
+            new_metadata = dict(doc.metadata)
             new_metadata['chunk_header'] = header.strip()
             new_metadata['chunk_id'] = str(uuid.uuid4())
-            new_metadata['chunk_number'] = chunk_num
-            new_metadata['total_chunks'] = total_chunks
+            new_metadata['chunk_number'] = 1
+            new_metadata['total_chunks'] = 1
             
             # Create new document with enhanced content and metadata
             processed_chunk = Document(page_content=new_content, metadata=new_metadata)
             all_processed_chunks.append(processed_chunk)
+        else:
+            # Split each document individually to maintain proper chunk numbering
+            chunks = splitter.split_documents([doc])
+            total_chunks = len(chunks)
+            
+            # Process each chunk with proper numbering
+            for chunk_num, chunk in enumerate(chunks, 1):
+                # Create specialized header
+                header = create_document_header(
+                    chunk.metadata["source"],
+                    chunk.metadata["patient_id"],
+                    chunk_num,
+                    total_chunks
+                )
+                
+                # Prepend header to content
+                new_content = header + chunk.page_content
+                
+                # Copy existing metadata and add chunk header info
+                new_metadata = dict(chunk.metadata)
+                new_metadata['chunk_header'] = header.strip()
+                new_metadata['chunk_id'] = str(uuid.uuid4())
+                new_metadata['chunk_number'] = chunk_num
+                new_metadata['total_chunks'] = total_chunks
+                
+                # Create new document with enhanced content and metadata
+                processed_chunk = Document(page_content=new_content, metadata=new_metadata)
+                all_processed_chunks.append(processed_chunk)
     
     print(f"Created {len(all_processed_chunks)} processed chunks with specialized headers")
     return all_processed_chunks
@@ -175,11 +233,13 @@ def serialize_intake_to_markdown(intake_data: dict) -> str:
     return "\n".join(markdown_content)
 
 
-def create_document_header(filename: str, patient_id: str, chunk_num: int, total_chunks: int) -> str:
+def create_document_header(filename: str, patient_id: str, chunk_num: int, total_chunks: int, is_assessment: bool = False) -> str:
     """Create appropriate header based on document type."""
     base_name = os.path.splitext(filename)[0].lower()
     
-    if base_name == "intake":
+    if is_assessment:
+        return f"ASSESSMENT #{chunk_num} of {total_chunks} — Patient: {patient_id}\n\n"
+    elif base_name == "intake":
         return f"INTAKE FORM - PART {chunk_num} of {total_chunks} — Patient: {patient_id}\n\n"
     elif base_name.startswith("session"):
         session_name = base_name.replace("_", " ").upper()
@@ -243,31 +303,51 @@ async def add_document_to_chroma(
         # Create document
         doc = Document(page_content=content, metadata=base_metadata)
         
-        # Split document into chunks
-        chunks = splitter.split_documents([doc])
-        total_chunks = len(chunks)
-        
-        # Process each chunk with headers and metadata
-        processed_chunks = []
-        for chunk_num, chunk in enumerate(chunks, 1):
-            # Create specialized header
-            header = create_document_header(filename, patient_id, chunk_num, total_chunks)
+        # Handle assessments differently - don't chunk them
+        if document_type == "assessment":
+            # For assessments, create header but don't chunk
+            header = create_document_header(filename, patient_id, 1, 1, is_assessment=True)
             
             # Prepend header to content
-            new_content = header + chunk.page_content
+            new_content = header + content
             
             # Copy existing metadata and add chunk-specific info
-            new_metadata = dict(chunk.metadata)
+            new_metadata = dict(base_metadata)
             new_metadata.update({
                 'chunk_header': header.strip(),
                 'chunk_id': str(uuid.uuid4()),
-                'chunk_number': chunk_num,
-                'total_chunks': total_chunks
+                'chunk_number': 1,
+                'total_chunks': 1
             })
             
-            # Create new document with enhanced content and metadata
-            processed_chunk = Document(page_content=new_content, metadata=new_metadata)
-            processed_chunks.append(processed_chunk)
+            # Create document with enhanced content and metadata
+            processed_chunks = [Document(page_content=new_content, metadata=new_metadata)]
+        else:
+            # Split document into chunks for non-assessment documents
+            chunks = splitter.split_documents([doc])
+            total_chunks = len(chunks)
+            
+            # Process each chunk with headers and metadata
+            processed_chunks = []
+            for chunk_num, chunk in enumerate(chunks, 1):
+                # Create specialized header
+                header = create_document_header(filename, patient_id, chunk_num, total_chunks)
+                
+                # Prepend header to content
+                new_content = header + chunk.page_content
+                
+                # Copy existing metadata and add chunk-specific info
+                new_metadata = dict(chunk.metadata)
+                new_metadata.update({
+                    'chunk_header': header.strip(),
+                    'chunk_id': str(uuid.uuid4()),
+                    'chunk_number': chunk_num,
+                    'total_chunks': total_chunks
+                })
+                
+                # Create new document with enhanced content and metadata
+                processed_chunk = Document(page_content=new_content, metadata=new_metadata)
+                processed_chunks.append(processed_chunk)
         
         # Generate unique IDs for chunks
         chunk_ids = [str(uuid.uuid4()) for _ in processed_chunks]

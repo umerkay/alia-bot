@@ -10,6 +10,9 @@
 - chromabDB will be picked from PVC so all services share it  (done)
 - online addition of documents to chroma DB (done)
 
+ PYTHONPATH=. python app/services/graphrag/process_ehr_docs.py
+ to add KG docs of EHR
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

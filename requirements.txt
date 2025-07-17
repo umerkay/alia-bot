@@ -12,3 +12,5 @@ uvicorn
 python-multipart
 jq
 rank_bm25
+neo4j
+neo4j-driver

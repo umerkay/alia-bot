@@ -143,3 +143,25 @@ def create_intake_form_retrieval_tool():
             return f"An error occurred during retrieval of intake form documents"
 
     return intake_form_retriever
+
+def create_assessment_retrieval_tool():
+
+    @tool
+    def assessment_retriever(query: str, config: RunnableConfig) -> str:
+        """Searches assessment results and information for the given query using semantic retrieval (RAG).
+
+        Args:
+            query (str): The query to search for assessment results, scores, insights, or assessment history.
+
+        Returns:
+            str: The retrieved assessment information.
+        """
+        
+        try:
+            patient_id = config["configurable"].get("patient_id")
+            return vectorstore_retrieval(query, patient_id=patient_id, document_type="assessment")
+        except Exception as e:
+            print(f"Error during retrieval: {e}")
+            return f"An error occurred during retrieval of assessment documents"
+
+    return assessment_retriever
