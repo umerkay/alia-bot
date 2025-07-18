@@ -4,7 +4,11 @@ import logging
 from typing import Dict, Any, List
 from pathlib import Path
 from app.services.graphrag.ehr_kg import EHRKnowledgeGraph
+from app.config import Settings
+import sys
+import os
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..')))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -23,9 +27,9 @@ class EHRDocumentProcessor:
         ...
     """
     
-    def __init__(self, neo4j_uri: str = "bolt://localhost:7687", 
-                 neo4j_user: str = "neo4j", 
-                 neo4j_password: str = "password"):
+    def __init__(self, neo4j_uri: str = None, 
+                 neo4j_user: str = None, 
+                 neo4j_password: str = None):
         """
         Initialize the EHR document processor.
         
@@ -34,7 +38,12 @@ class EHRDocumentProcessor:
             neo4j_user (str): Neo4j username
             neo4j_password (str): Neo4j password
         """
-        self.kg = EHRKnowledgeGraph(neo4j_uri, neo4j_user, neo4j_password)
+        settings = Settings()
+        self.kg = EHRKnowledgeGraph(
+            neo4j_uri or settings.NEO4J_URI,
+            neo4j_user or settings.NEO4J_USER,
+            neo4j_password or settings.NEO4J_PASSWORD
+        )
         self.processed_patients = []
         self.failed_patients = []
         
@@ -197,17 +206,11 @@ def main():
     Example usage of the EHRDocumentProcessor.
     """
     # Configuration
-    SHARED_DOCS_DIR = "/Users/vyromacbook/Desktop/Programming/aliahealth/shared_docs"
-    NEO4J_URI = "bolt://localhost:7687"
-    NEO4J_USER = "neo4j"
-    NEO4J_PASSWORD = "password"
+    settings = Settings()
+    SHARED_DOCS_DIR = str(settings.shared_docs_path.resolve())
     
-    # Initialize processor
-    processor = EHRDocumentProcessor(
-        neo4j_uri=NEO4J_URI,
-        neo4j_user=NEO4J_USER,
-        neo4j_password=NEO4J_PASSWORD
-    )
+    # Initialize processor (will use settings defaults)
+    processor = EHRDocumentProcessor()
     
     try:
         # Process all EHR documents

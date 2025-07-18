@@ -1,0 +1,72 @@
+{
+  "diagnosis": [
+    {
+      "name": "Body mass index 30.00 to 34.99",
+      "date": "Unknown",
+      "status": "active",
+      "description": "The patient has a BMI indicating obesity, which is currently active."
+    },
+    {
+      "name": "Depression",
+      "date": "Unknown",
+      "status": "active",
+      "description": "The patient is currently diagnosed with depression."
+    },
+    {
+      "name": "Amenorrhea",
+      "date": "Unknown",
+      "status": "active",
+      "description": "The patient is experiencing amenorrhea, which is the absence of menstruation."
+    },
+    {
+      "name": "Tibialis posterior tendinitis, right",
+      "date": "Unknown",
+      "status": "active",
+      "description": "The patient has an active diagnosis of tendinitis in the right tibialis posterior."
+    },
+    {
+      "name": "Contact w and exposure to oth viral communicable diseases",
+      "date": "Unknown",
+      "status": "active",
+      "description": "The patient has been in contact with and exposed to other viral communicable diseases."
+    },
+    {
+      "name": "Covid-19 Send Out Testing",
+      "date": "Unknown",
+      "status": "resolved",
+      "description": "The patient underwent Covid-19 testing, which is now resolved."
+    },
+    {
+      "name": "False labor at or after 37 completed weeks of gestation",
+      "date": "2021-04-29T06:41:00+00:00",
+      "status": "active",
+      "description": "The patient experienced false labor at or after 37 weeks of gestation."
+    },
+    {
+      "name": "Finding of uterine contractions",
+      "date": "2021-04-29T18:29:00+00:00",
+      "status": "active",
+      "description": "The patient has active uterine contractions."
+    },
+    {
+      "name": "Gestation period, 40 weeks",
+      "date": "2021-04-29T18:29:00+00:00",
+      "status": "active",
+      "description": "The patient is at a gestation period of 40 weeks."
+    },
+    {
+      "name": "Pain in right foot",
+      "date": "2022-11-08T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient is experiencing pain in the right foot."
+    }
+  ],
+  "family_history": [
+    {
+      "name": "Unknown",
+      "relationship": "Unknown",
+      "description": "The patient has a family history of cardiovascular disease, diabetes mellitus, kidney disease, cancer of unknown type, and arthritis."
+    }
+  ],
+  "medication": []
+}

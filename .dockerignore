@@ -8,3 +8,15 @@ __pycache__/
 .gitignore
 Dockerfile
 README.md
+app/__pycache__/
+*.egg-info/
+dist/
+build/
+eggs/
+.pytest_cache/
+venv/
+.DS_Store # macOS-specific
+*.swp      # Vim swap files
+*~        # backup files
+*.log
+shared_chroma_db

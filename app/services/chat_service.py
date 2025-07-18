@@ -1,5 +1,5 @@
 import json
-from app.agent import get_agent_executor, chat_history_store, MAX_MESSAGES, ClinicalAgentState, create_initial_clinical_state
+from app.agent import get_agent_executor, chat_history_store, MAX_MESSAGES
 from langchain_core.messages import HumanMessage, AIMessage
 from datetime import datetime
 import re
@@ -7,6 +7,15 @@ import re
 
 async def chat_stream(data: str, conversation_id: str = "abc123"):
     """Handles streaming chat responses from LangGraph workflow."""
+    
+    # Tool mapper for display names
+    tool_mapper = {
+        "transcript_agent": "Analyzing patient transcripts",
+        "intake_form_retriever": "Retrieving intake form information",
+        "ehr_retriever": "Retrieving EHR data",
+        "assessment_agent": "Generating patient assessment",
+        "rag_tool": "Searching medical knowledge base"
+    }
     
     try:
         # Check if agent executor is initialized
@@ -16,48 +25,47 @@ async def chat_stream(data: str, conversation_id: str = "abc123"):
             return
         
         # Configuration for the workflow
-        config = {"configurable": {"thread_id": conversation_id, "patient_id": "patient2"}}
+        config = {"configurable": {"thread_id": conversation_id, "patient_id": "patient1"}}
         
-        # Create initial state for the clinical workflow
+        # Get previous messages and add new user message
         previous_messages = chat_history_store.get(conversation_id, [])
         new_user_message = HumanMessage(content=data)
         messages = previous_messages + [new_user_message]
-        
-        # Build the initial state using the ClinicalAgentState helper
-        initial_state = create_initial_clinical_state(messages)
         
         # Track response and final AI message for history
         response_count = 0
         final_ai_message = None
         
         try:
-            async for chunk in agent_executor.astream(initial_state, config):
+            async for chunk in agent_executor.astream_events({"messages": messages}, config, stream_mode="messages", version="v2"):
                 response_count += 1
+                kind = chunk["event"]
                 
-                # Process each node output in the chunk
-                for node_output in chunk.values():
-                    # Get the last message from this node
-                    node_messages = node_output.get("messages", [])
-                    if not node_messages:
-                        continue
-                    
-                    last_message = node_messages[-1]
-                    if not hasattr(last_message, 'content') or not last_message.content:
-                        continue
-                    
-                    content = last_message.content.strip()
-                    if not content:
-                        continue
-                    
-                    # Determine message type and stream accordingly
-                    if "TRANSCRIPT_NEEDED:" in content:
-                        yield chat_response(conversation_id, "Routing to transcript analysis...", "routing")
-                    # elif "Analyzing transcripts" in content or node_output.get("query_type") == "transcript":
-                        # yield chat_response(conversation_id, "Analyzing transcripts...", "transcript_processing")
-                    else:
-                        # This is the actual response content
+                if kind == "on_chat_model_stream":
+                    content = chunk["data"]["chunk"].content
+                    if content:
                         yield chat_response(conversation_id, content, "")
-                        final_ai_message = last_message
+                        final_ai_message = chunk["data"]["chunk"]
+                
+                elif kind == "on_tool_start":
+                    tool_name = chunk["name"]
+                    if tool_name in tool_mapper:
+                        message = tool_mapper.get(tool_name, f"Starting {tool_name}...")
+                        yield chat_response(conversation_id, message, tool_name)
+                
+                elif kind == "on_tool_end":
+                    tool_name = chunk["name"]
+                    if tool_name in tool_mapper:
+                        # Extract and send tool output
+                        output_content = chunk["data"].get("output")
+                        output_msg = f"Completed {tool_name}"
+                        
+                        if hasattr(output_content, "content"):
+                            output_msg = output_content.content
+                        elif isinstance(output_content, str):
+                            output_msg = output_content
+                        
+                        yield chat_response(conversation_id, output_msg, tool_name)
             
             # Update chat history with final AI response
             if final_ai_message:
@@ -86,7 +94,7 @@ def chat_response(conversation_id, content, tool, finish_reason=None):
         "object": "chat.completion.chunk",
         "created": str(datetime.now().timestamp()),
         "model": "gemini-2.0-flash",
-        "system_fingerprint": "agro-ai",
+        "system_fingerprint": "alia-ai",
         "choices": [
             {
                 "index": 0,

@@ -71,14 +71,3 @@ def process_assessments_to_markdown(assessments_data):
         md = process_assessment(report)
         markdown_assessments.append(md)
     return markdown_assessments
-
-def main():
-    data = load_json('/Users/vyromacbook/Desktop/Programming/aliahealth/shared_docs/patient1/assessments.json')
-
-    with open('output.md', 'w') as out_file:
-        for report in data:
-            md = process_assessment(report)
-            out_file.write(md + "\n")
-
-if __name__ == "__main__":
-    main()

@@ -21,8 +21,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+# Make start script executable
+RUN chmod +x /app/start.sh
+
 # Expose the port used by Uvicorn
 EXPOSE 7860
 
-# Start FastAPI app with Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Use entrypoint script
+CMD ["/app/start.sh"]

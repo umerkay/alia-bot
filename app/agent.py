@@ -1,33 +1,14 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
-from langgraph.graph import StateGraph, END
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 from app.config import settings
 from app.services.rag_tool import create_intake_form_retrieval_tool, create_transcript_retrieval_tool, create_assessment_retrieval_tool
 from app.services.graph_rag_tool import create_ehr_retrieval_tool
 from app.services.prompts import get_main_agent_prompt, get_transcript_agent_prompt, get_assessment_agent_prompt
-from typing import Dict, List, TypedDict, Literal
+from typing import Dict, List
 import datetime
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
-
-
-
-# Define the state schema
-class ClinicalAgentState(TypedDict):
-    messages: List[BaseMessage]
-    transcript_response: str
-    query_type: Literal["general", "transcript", ""]
-    completed: bool
-
-def create_initial_clinical_state(messages: List[BaseMessage]) -> ClinicalAgentState:
-    """Create an initial ClinicalAgentState with default values"""
-    return ClinicalAgentState(
-        messages=messages,
-        transcript_response="",
-        query_type="",
-        completed=False
-    )
 
 # Setup LangChain components
 model = ChatGoogleGenerativeAI(
@@ -41,23 +22,46 @@ MAX_MESSAGES = 20  # 10 turns (Human + AI)
 # Global agent executor
 agent_executor = None
 
-def build_main_agent(transcript_context = None):
+async def build_main_agent():
     """Build the main clinical agent that routes queries"""
-    prompt = get_main_agent_prompt(transcript_context)
-    tools = [create_intake_form_retrieval_tool(), create_ehr_retrieval_tool(), get_assessment_agent_tool()]
+    prompt = get_main_agent_prompt()
+    tools = [create_intake_form_retrieval_tool(), create_ehr_retrieval_tool(), get_transcript_agent_tool(), get_assessment_agent_tool()]
     return create_react_agent(model, tools, prompt=prompt)
 
-def build_transcript_agent():
-    """Build the specialized transcript agent with RAG tool"""
-    async def _build():
-        tools = [create_transcript_retrieval_tool()]
+async def build_transcript_agent():
+    """Build the specialized transcript agent"""
+    tools = [create_transcript_retrieval_tool()]
+    prompt = get_transcript_agent_prompt()
+    return create_react_agent(model, tools, prompt=prompt)
+
+_transcript_agent = None
+
+async def get_transcript_agent():
+    global _transcript_agent
+    if _transcript_agent is None:
+        _transcript_agent = await build_transcript_agent()
+    return _transcript_agent
+
+def get_transcript_agent_tool():
+    @tool
+    async def transcript_agent(query: str, config: RunnableConfig) -> str:
+        """Use this tool for transcript-related questions.
         
-        prompt = get_transcript_agent_prompt()
-        
-        return create_react_agent(model, tools, prompt=prompt)
+        Args:
+            query (str): The query to ask the transcript agent.
+
+        Returns:
+            str: The response from the transcript agent.
+
+        """
+        print(f"Calling transcript agent with query: {query}")
+        transcript_agent = await get_transcript_agent()
+        response = await transcript_agent.ainvoke({"messages": [HumanMessage(content=query)]}, config=config)
+        last_message = response.get("messages", [])[-1] if response.get("messages") else None
+        return last_message.content.strip() if last_message else "(No response from transcript agent)"
     
-    return _build()
-    
+    return transcript_agent
+
 async def build_assessment_agent():
     """Build the specialized assessment agent"""
     tools = [create_assessment_retrieval_tool()]
@@ -92,117 +96,6 @@ def get_assessment_agent_tool():
     
     return assessment_agent
 
-    
-async def main_agent_handler(state: ClinicalAgentState, config: RunnableConfig):
-    transcript_context = state.get("transcript_response", "")
-    main_agent = build_main_agent(transcript_context)
-    
-    messages = state["messages"]
-    print("State at main_agent_handler entry:", state)
-
-    try:
-        print("Invoking main_agent with messages:", messages)
-        response = await main_agent.ainvoke({"messages": messages}, config=config)
-        last_message = response.get("messages", [])[-1] if response.get("messages") else None
-        response_content = last_message.content.strip() if last_message and hasattr(last_message, "content") else ""
-    except Exception as e:
-        print("Error during main_agent.invoke():", e)
-        response_content = ""
-
-    print("Main agent response content:", repr(response_content))
-
-    new_state = state.copy()
-
-    if response_content:
-        new_state["messages"] = state["messages"] + [AIMessage(content=response_content)]
-    else:
-        new_state["messages"] = state["messages"] + [AIMessage(content="(No response generated by main agent.)")]
-
-    # Logic for determining if we need transcript or it's complete
-    if not state.get("transcript_response") and "TRANSCRIPT_NEEDED:" in response_content:
-        new_state["query_type"] = "transcript"
-        print("Routing to transcript analysis")
-    else:
-        new_state["query_type"] = "general"
-        new_state["completed"] = True
-        print("Marking workflow as completed")
-
-    return new_state
-
-async def transcript_agent_handler(state: ClinicalAgentState, config: RunnableConfig):
-    """Handler for the transcript analysis agent"""
-    transcript_agent = await build_transcript_agent()
-    
-    # Get the original user query
-    user_messages = [msg for msg in state["messages"] if isinstance(msg, HumanMessage)]
-    if user_messages:
-        original_query = user_messages[-1].content
-        response = transcript_agent.invoke({"messages": [HumanMessage(content=original_query)]}, config=config)
-        response_content = response["messages"][-1].content
-        
-        new_state = state.copy()
-        new_state["transcript_response"] = response_content
-        new_state["query_type"] = "general"  # Will route back to main agent for synthesis
-        new_state["completed"] = False  # ✅ Ensure main_agent will run again
-        
-        print("Transcript analysis completed")
-        return new_state
-    else:
-        # Fallback if no user message found
-        new_state = state.copy()
-        new_state["transcript_response"] = "Unable to process transcript query - no user message found"
-        new_state["query_type"] = "general"
-        new_state["completed"] = False  # ✅ Ensure main_agent will run again
-        return new_state
-
-def should_route(state: ClinicalAgentState) -> Literal["transcript", "main_agent", "complete"]:
-    """Determine the next step in the workflow"""
-    if state["query_type"] == "transcript" and not state["transcript_response"]:
-        return "transcript"
-    elif state["transcript_response"] and state["query_type"] == "general" and not state.get("completed"):
-        return "main_agent"  # Go back to main agent for synthesis
-    else:
-        return "complete"
-
-def build_clinical_workflow():
-    """Build and return the clinical agent workflow"""
-    # Define the workflow
-    workflow = StateGraph(ClinicalAgentState)
-    
-    # Add nodes
-    workflow.add_node("main_agent", main_agent_handler)
-    workflow.add_node("transcript_agent", transcript_agent_handler)
-    
-    # Define edges
-    workflow.add_conditional_edges(
-        "main_agent",
-        should_route,
-        {
-            "transcript": "transcript_agent",
-            "main_agent": "main_agent",  # Loop back for synthesis
-            "complete": END
-        }
-    )
-    
-    # After transcript analysis, go back to main agent
-    workflow.add_conditional_edges(
-        "transcript_agent", 
-        should_route,
-        {
-            "main_agent": "main_agent",
-            "complete": END
-        }
-    )
-    
-    # Set entry point
-    workflow.set_entry_point("main_agent")
-    
-    # Compile the workflow
-    app = workflow.compile()
-    
-    print("Clinical agent workflow initialized")
-    return app
-
 def get_agent_executor():
     return agent_executor
 
@@ -210,7 +103,7 @@ async def init_agent():
     """Initialize the global agent executor"""
     global agent_executor
     try:
-        agent_executor = build_clinical_workflow()
+        agent_executor = await build_main_agent()
         print("Agent initialized successfully")
             
     except Exception as e:

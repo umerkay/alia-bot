@@ -1,18 +1,3 @@
-
-# TODO
-- make ehr KG very easy and add a tool
-- make assessments KG slightly harder and add tool maybe use ensemble
-- rewrite detailed main system prompt to properly guide it (multi tool calling, what each source does)
-- temporal analysis? maybe include in initial system prompt so tie each conv id -> patient
-
-- separate message history to a DB so that multiple workers can be run ?? no
-- separate BM25 into a server like elastic search running locally ?? no
-- chromabDB will be picked from PVC so all services share it  (done)
-- online addition of documents to chroma DB (done)
-
- PYTHONPATH=. python app/services/graphrag/process_ehr_docs.py
- to add KG docs of EHR
-
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -25,8 +10,8 @@ Before you begin, ensure you have the following installed:
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/umerkayvyro/crop-chat/
-    cd crop-chat
+    git clone https://github.com/umerkayvyro/alia-bot/
+    cd alia-bot
     ```
 
 2.  **Create a conda environment (recommended):**

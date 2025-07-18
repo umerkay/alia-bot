@@ -1,0 +1,116 @@
+{
+  "diagnosis": [
+    {
+      "name": "Major depressive disorder, recurrent episode, moderate",
+      "date": "2023-08-15T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient is currently experiencing a moderate episode of recurrent major depressive disorder."
+    },
+    {
+      "name": "Generalized anxiety disorder",
+      "date": "2023-08-15T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient has been diagnosed with generalized anxiety disorder characterized by excessive worry and fear."
+    },
+    {
+      "name": "Essential hypertension",
+      "date": "2022-03-10T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient has high blood pressure that requires ongoing management."
+    },
+    {
+      "name": "Type 2 diabetes mellitus without complications",
+      "date": "2021-11-22T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient has type 2 diabetes that is currently well-controlled without complications."
+    },
+    {
+      "name": "Chronic insomnia disorder",
+      "date": "2023-06-02T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient experiences persistent difficulty falling asleep and staying asleep."
+    },
+    {
+      "name": "Adjustment disorder with mixed anxiety and depressed mood",
+      "date": "2023-05-01T00:00:00+00:00",
+      "status": "resolved",
+      "description": "The patient experienced adjustment difficulties following a major life change, which has since resolved."
+    },
+    {
+      "name": "Chronic lower back pain",
+      "date": "2020-09-14T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient has ongoing lower back pain related to previous injury."
+    },
+    {
+      "name": "Migraine headaches",
+      "date": "2019-04-18T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient experiences recurring migraine headaches that impact daily functioning."
+    },
+    {
+      "name": "Vitamin D deficiency",
+      "date": "2023-02-28T00:00:00+00:00",
+      "status": "resolved",
+      "description": "The patient had vitamin D deficiency which has been corrected with supplementation."
+    },
+    {
+      "name": "Gastroesophageal reflux disease",
+      "date": "2022-07-12T00:00:00+00:00",
+      "status": "active",
+      "description": "The patient has GERD that is managed with dietary modifications and medication."
+    }
+  ],
+  "family_history": [
+    {
+      "name": "Heart disease",
+      "relationship": "Father",
+      "description": "Father had coronary artery disease and suffered a heart attack at age 62."
+    },
+    {
+      "name": "Type 2 diabetes",
+      "relationship": "Mother",
+      "description": "Mother was diagnosed with type 2 diabetes at age 58 and managed it with medication and diet."
+    },
+    {
+      "name": "Depression",
+      "relationship": "Sister",
+      "description": "Younger sister has been treated for depression and anxiety since her twenties."
+    },
+    {
+      "name": "Alzheimer's disease",
+      "relationship": "Maternal grandmother",
+      "description": "Maternal grandmother developed Alzheimer's disease in her late seventies."
+    }
+  ],
+  "medication": [
+    {
+      "name": "Sertraline",
+      "dosage": "50mg daily",
+      "indication": "Depression and anxiety",
+      "start_date": "2023-08-15T00:00:00+00:00",
+      "status": "active"
+    },
+    {
+      "name": "Metformin",
+      "dosage": "1000mg twice daily",
+      "indication": "Type 2 diabetes",
+      "start_date": "2021-11-22T00:00:00+00:00",
+      "status": "active"
+    },
+    {
+      "name": "Lisinopril",
+      "dosage": "10mg daily",
+      "indication": "Hypertension",
+      "start_date": "2022-03-10T00:00:00+00:00",
+      "status": "active"
+    },
+    {
+      "name": "Trazodone",
+      "dosage": "25mg at bedtime",
+      "indication": "Insomnia",
+      "start_date": "2023-06-02T00:00:00+00:00",
+      "status": "active"
+    }
+  ]
+}

@@ -25,11 +25,41 @@
 
       .container {
         width: 100%;
-        max-width: 900px;
+        max-width: 1400px;
         margin: auto;
         display: flex;
         flex-direction: column;
         gap: 24px;
+      }
+
+      .chat-container {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+      }
+
+      .main-chat {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .side-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 500px;
+        width: 500px;
+        overflow-x: hidden;
+      }
+
+      .side-panel h3 {
+        color: #007bff;
+        margin: 0 0 12px 0;
+        font-size: 1.2rem;
+        font-weight: 600;
       }
 
       h1 {
@@ -41,7 +71,20 @@
       }
 
       #chat-box {
-        height: 500px;
+        height: 600px;
+        background: #1a1a1a;
+        border: 1px solid #333333;
+        border-radius: 12px;
+        overflow-y: auto;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        scrollbar-width: thin;
+        scrollbar-color: #007bff transparent;
+      }
+
+      #tools-panel {
+        height: 600px;
         background: #1a1a1a;
         border: 1px solid #333333;
         border-radius: 12px;
@@ -62,6 +105,19 @@
       }
 
       #chat-box::-webkit-scrollbar-thumb {
+        background: #007bff;
+        border-radius: 3px;
+      }
+
+      #tools-panel::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #tools-panel::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      #tools-panel::-webkit-scrollbar-thumb {
         background: #007bff;
         border-radius: 3px;
       }
@@ -97,7 +153,7 @@
       .tools {
         background: #1a1a1a;
         border: 1px solid #007bff;
-        margin: 8px 40px;
+        margin: 8px 0;
         font-size: 0.9em;
         opacity: 0.9;
         color: #007bff;
@@ -108,6 +164,88 @@
         gap: 12px;
         width: 100%;
         margin-top: 20px;
+      }
+
+      .patient-selector {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 16px 20px;
+        background: #1a1a1a;
+        border: 1px solid #333333;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .patient-selector label {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .patient-selector select {
+        padding: 8px 16px;
+        background: #000000;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.3s ease;
+        min-width: 120px;
+      }
+
+      .patient-selector select:hover {
+        border-color: #007bff;
+      }
+
+      .patient-selector select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+      }
+
+      .patient-selector select option {
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 8px;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .chat-container {
+          flex-direction: column;
+        }
+
+        .side-panel {
+          max-width: 100%;
+          width: 100%;
+        }
+        
+        .container {
+          max-width: 100%;
+          padding: 0 10px;
+        }
+        
+        #chat-box, #tools-panel {
+          height: 300px;
+        }
+        
+        .side-panel h3 {
+          text-align: center;
+        }
+        
+        .patient-selector {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        
+        .patient-selector select {
+          width: 100%;
+        }
       }
 
       input {
@@ -273,21 +411,60 @@
     <!-- Include marked.js library for markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <div class="container">
-      <h1>Alia Health</h1>
-      <div id="chat-box"></div>
-      <div class="input-container">
-        <input
-          type="text"
-          id="message"
-          placeholder="Type a message..."
-          onkeypress="if(event.key==='Enter') sendMessage()"
-        />
-        <button onclick="sendMessage()" id="sendbtn">Send</button>
+      <div class="chat-container">
+        <div class="main-chat">
+          <div class="patient-selector">
+            <label for="patient-select">Select Patient:</label>
+            <select id="patient-select" onchange="changePatient()">
+              <option value="patient1">Patient 1</option>
+              <option value="patient2">Patient 2</option>
+            </select>
+          </div>
+          <div id="chat-box"></div>
+          <div class="input-container">
+            <input
+              type="text"
+              id="message"
+              placeholder="Type a message..."
+              onkeypress="if(event.key==='Enter') sendMessage()"
+            />
+            <button onclick="sendMessage()" id="sendbtn">Send</button>
+          </div>
+        </div>
+        <div class="side-panel">
+          <h3>Reference</h3>
+          <div id="tools-panel"></div>
+        </div>
       </div>
     </div>
 
     <script>
       let conversationId = "";
+      let currentPatient = "patient1"; // Default to patient1
+
+      function changePatient() {
+        const patientSelect = document.getElementById("patient-select");
+        const newPatient = patientSelect.value;
+        
+        // Only clear if actually changing patients
+        if (newPatient !== currentPatient) {
+          // Clear conversation history
+          conversationId = "";
+          document.getElementById("chat-box").innerHTML = "";
+          document.getElementById("tools-panel").innerHTML = "";
+          
+          // Update current patient
+          currentPatient = newPatient;
+          
+          // Show a system message about the patient change
+          const systemMessageDiv = document.createElement('div');
+          systemMessageDiv.className = 'message tools';
+          systemMessageDiv.style.borderColor = '#28a745';
+          systemMessageDiv.style.color = '#28a745';
+          systemMessageDiv.innerHTML = `<strong>✅ System:</strong> Switched to ${newPatient.charAt(0).toUpperCase() + newPatient.slice(1)}. Conversation history cleared.`;
+          document.getElementById("tools-panel").appendChild(systemMessageDiv);
+        }
+      }
 
       async function sendMessage() {
         const message = document.getElementById("message").value;
@@ -308,7 +485,8 @@
 
         // Prepare JSON request body
         const requestBody = {
-          prompt: message
+          prompt: message,
+          patient: currentPatient // Include the selected patient
         };
         
         if (conversationId) {
@@ -316,7 +494,7 @@
         }
 
         try {
-          const response = await fetch("http://localhost:8000/chat", {
+          const response = await fetch("/chat", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -376,32 +554,39 @@
                           currentAgentMessage += content;
                           agentMessageDiv.innerHTML = `<strong>Agent:</strong> ${marked.parse(currentAgentMessage)}`;
                           
-                        } else if (tool === "transcript_agent") {
-                          // Transcript agent response - show with special indicator
-                          if (!agentMessageDiv) {
-                            agentMessageDiv = document.createElement('div');
-                            agentMessageDiv.className = 'message agent';
-                            agentMessageDiv.innerHTML = '<strong>📄 Transcript Analysis:</strong> ';
-                            document.getElementById("chat-box").appendChild(agentMessageDiv);
-                            currentAgentMessage = "";
-                          }
-                          
-                          currentAgentMessage += content;
-                          agentMessageDiv.innerHTML = `<strong>📄 Transcript Analysis:</strong> ${marked.parse(currentAgentMessage)}`;
-                          
                         } else if (tool === "error") {
                           const toolDiv = document.createElement('div');
                           toolDiv.className = 'message tools';
                           toolDiv.style.borderColor = '#dc3545';
                           toolDiv.style.color = '#dc3545';
                           toolDiv.innerHTML = `<strong>❌ Error:</strong> ${marked.parse(content)}`;
-                          document.getElementById("chat-box").appendChild(toolDiv);
-                        } else if (content) {
-                          // Generic tool message
+                          document.getElementById("tools-panel").appendChild(toolDiv);
+                        } else {
+                          // Show all tool messages, including those with empty content
                           const toolDiv = document.createElement('div');
                           toolDiv.className = 'message tools';
-                          toolDiv.innerHTML = `<strong>🔧 ${tool}:</strong> ${marked.parse(content)}`;
-                          document.getElementById("chat-box").appendChild(toolDiv);
+                          
+                          // Different icons and colors for different tools
+                          let icon = '🔧';
+                          let displayName = tool;
+                          
+                          if (tool === "transcript_agent") {
+                            icon = '📝';
+                            displayName = 'Transcript Agent';
+                          } else if (tool === "intake_form_retriever") {
+                            icon = '�';
+                            displayName = 'Intake Form Retriever';
+                          } else if (tool === "ehr_retriever") {
+                            icon = '🏥';
+                            displayName = 'EHR Retriever';
+                          } else if (tool === "assessment_agent") {
+                            icon = '🔍';
+                            displayName = 'Assessment Agent';
+                          }
+                          
+                          const message = content ? marked.parse(content) : 'Processing...';
+                          toolDiv.innerHTML = `<strong>${icon} ${displayName}:</strong> ${message}`;
+                          document.getElementById("tools-panel").appendChild(toolDiv);
                         }
                       } else if (content) {
                         // Handle agent messages - append to current message
@@ -430,9 +615,11 @@
                 }
               });
               
-              // Auto-scroll to bottom
+              // Auto-scroll to bottom for both panels
               const chatBox = document.getElementById("chat-box");
+              const toolsPanel = document.getElementById("tools-panel");
               chatBox.scrollTop = chatBox.scrollHeight;
+              toolsPanel.scrollTop = toolsPanel.scrollHeight;
             }
           } catch (streamError) {
             console.error("Error during streaming:", streamError);
@@ -443,11 +630,13 @@
             errorDiv.style.borderColor = '#dc3545';
             errorDiv.style.color = '#dc3545';
             errorDiv.innerHTML = `<strong>❌ Streaming Error:</strong> ${streamError.message}`;
-            document.getElementById("chat-box").appendChild(errorDiv);
+            document.getElementById("tools-panel").appendChild(errorDiv);
             
-            // Auto-scroll to bottom
+            // Auto-scroll to bottom for both panels
             const chatBox = document.getElementById("chat-box");
+            const toolsPanel = document.getElementById("tools-panel");
             chatBox.scrollTop = chatBox.scrollHeight;
+            toolsPanel.scrollTop = toolsPanel.scrollHeight;
           }
 
         } catch (error) {
@@ -459,11 +648,13 @@
           errorDiv.style.borderColor = '#dc3545';
           errorDiv.style.color = '#dc3545';
           errorDiv.innerHTML = `<strong>❌ Connection Error:</strong> ${error.message}`;
-          document.getElementById("chat-box").appendChild(errorDiv);
+          document.getElementById("tools-panel").appendChild(errorDiv);
           
-          // Auto-scroll to bottom
+          // Auto-scroll to bottom for both panels
           const chatBox = document.getElementById("chat-box");
+          const toolsPanel = document.getElementById("tools-panel");
           chatBox.scrollTop = chatBox.scrollHeight;
+          toolsPanel.scrollTop = toolsPanel.scrollHeight;
         } finally {
           // Re-enable controls
           sendBtn.disabled = false;

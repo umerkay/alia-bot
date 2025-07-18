@@ -90,7 +90,6 @@ def vectorstore_retrieval(query: str, patient_id: str, document_type: str) -> st
         }
         results = retriever.invoke(query)
         print(query)
-        print(results)
         if not results:
             return "No relevant documents found."
         contents = results[0].metadata["source"] + ("="*10) + "\n"
@@ -104,10 +103,13 @@ def create_transcript_retrieval_tool():
 
     @tool
     def rag_retriever(query: str, config: RunnableConfig) -> str:
-        """Searches therapy session transcripts for the given query using semantic retrieval (RAG).
+        """Searches a patient’s therapy session transcripts using semantic retrieval (RAG).
+
+        Use this tool to find relevant information from a patient’s past session transcripts
+        when answering mental health or therapy-related questions.
 
         Args:
-            query (str): The query to search for.
+            query (str): The keywords to search for, include as much context as possible.
 
         Returns:
             str: The retrieved information.
@@ -126,10 +128,14 @@ def create_intake_form_retrieval_tool():
 
     @tool
     def intake_form_retriever(query: str, config: RunnableConfig) -> str:
-        """Searches intake form information for the given query using semantic retrieval (RAG).
+        """
+        Searches a patient’s intake form information using semantic retrieval (RAG).
+
+        Use this tool to find relevant details from a patient’s intake forms, such as
+        background information, or initial concerns, to support therapy-related questions.
 
         Args:
-            query (str): The query to search for.
+            query (str): The keywords to search for, include as much context as possible.
 
         Returns:
             str: The retrieved information.

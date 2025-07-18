@@ -2,10 +2,15 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from neo4j import GraphDatabase
 from typing import Literal
+from app.config import Settings
 
 class EHRKGQuery:
-    def __init__(self, uri="bolt://localhost:7687", user="neo4j", password="password"):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+    def __init__(self, uri=None, user=None, password=None):
+        settings = Settings()
+        self.driver = GraphDatabase.driver(
+            uri or settings.NEO4J_URI,
+            auth=(user or settings.NEO4J_USER, password or settings.NEO4J_PASSWORD)
+        )
 
     def query_ehr(self, patient_id: str, question: str) -> str:
         with self.driver.session() as session:
@@ -36,7 +41,7 @@ class EHRKGQuery:
                     for r in records
                 ])
 
-            elif "family history" in question:
+            elif "family_history" in question:
                 result = session.run("""
                     MATCH (p:Patient {id: $pid})-[:HAS_RELATIVE]->(r:Relative)-[:HAD_CONDITION]->(c:Condition)
                     RETURN r.relation AS relative, c.name AS condition, r.description AS description

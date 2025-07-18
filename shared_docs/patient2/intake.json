@@ -1,0 +1,39 @@
+{
+  "responses": [
+    {
+      "id": 1,
+      "title": "Reason for Seeking Help & Core Concerns",
+      "response": "What are the primary concerns bringing you to therapy at this time? I'm dealing with persistent depression that has been getting worse over the past year. I feel hopeless most days and have lost interest in activities I used to enjoy. I'm also struggling with chronic worry about my health, especially since my diabetes diagnosis. What specific challenges or difficulties are you experiencing as a result of these concerns? The depression makes it hard to get out of bed some days, and I've been calling in sick to work more often. My constant health anxiety leads to frequent doctor visits and checking my blood sugar obsessively. I feel like I'm not the same person I used to be."
+    },
+    {
+      "id": 2,
+      "title": "Treatment Goals & Desired Outcomes",
+      "response": "What are your main goals for treatment? I want to feel like myself again - to have energy and motivation to do things I care about. I'd like to manage my health anxiety better so I'm not constantly worried about my diabetes and blood pressure. I also want to improve my sleep because the insomnia is making everything worse. How will you know when therapy has been successful for you? I'll know therapy is working when I can wake up feeling hopeful about the day ahead, when I can enjoy time with my family again, and when I can manage my health conditions without being consumed by worry about them."
+    },
+    {
+      "id": 3,
+      "title": "Emotional & Mood Symptoms",
+      "response": "Please select any of the following emotional or mood symptoms you have experienced recently: Persistent feelings of sadness, emptiness, or hopelessness (daily for several months), Loss of interest or pleasure in activities you once enjoyed, Excessive worry about health and physical symptoms, Feeling overwhelmed by daily responsibilities, Frequent crying spells or feeling like crying but unable to. On a scale of 1-10 (1 being no impact, 10 being severe impact), how much do your mood symptoms impact your daily functioning and relationships? Depression: 8, Health anxiety: 7. How long have you been experiencing these mood changes? The depression has been ongoing for about 14 months, but it really intensified after my diabetes diagnosis last year."
+    },
+    {
+      "id": 4,
+      "title": "Thought Patterns & Cognitive Symptoms",
+      "response": "Please select any of the following thought patterns or cognitive symptoms you have experienced recently: Persistent thoughts about worst-case health scenarios, Difficulty concentrating at work or remembering things, Thoughts of being a burden to family members, Catastrophic thinking about medical test results or symptoms. Do you have any thoughts of self-harm or suicide? I sometimes think about not being here anymore, but I don't have any specific plans. I just feel like my family would be better off without having to worry about me."
+    },
+    {
+      "id": 5,
+      "title": "Behavioral Responses",
+      "response": "Please select any of the following behavioral changes you have experienced recently: Withdrawing from social activities and family gatherings, Decreased productivity at work, Frequent checking of blood sugar and blood pressure, Excessive researching of health symptoms online, Avoiding physical activities due to health fears. Are there specific situations that worsen your symptoms? Medical appointments, reading about diabetes complications online, and seeing my family worry about me tend to trigger both my depression and health anxiety."
+    },
+    {
+      "id": 6,
+      "title": "Physical Sensations & Sleep Patterns",
+      "response": "Please select any of the following physical symptoms you have experienced recently: Chronic difficulty falling asleep and staying asleep (waking up at 3-4 AM regularly), Significant fatigue during the day, Loss of appetite or changes in eating patterns, Frequent headaches and muscle tension, Physical symptoms that increase health worry (chest tightness, dizziness). How many hours of sleep do you typically get per night? Usually 4-5 hours, sometimes less when my mind is racing about health concerns."
+    },
+    {
+      "id": 7,
+      "title": "Past Treatment & Coping Strategies",
+      "response": "Have you received any prior mental health treatment? If so, what was helpful and what was not? I tried counseling briefly about 5 years ago for work stress, which helped somewhat. I started on Sertraline a few months ago which has helped a little with the depression but not much with the anxiety. I've never done therapy specifically for health anxiety. What coping strategies, if any, do you currently use when you feel depressed or anxious? I try to distract myself with TV or reading, but it's hard to concentrate. I talk to my sister sometimes, which helps. Prayer and meditation used to help, but I haven't been able to focus on those lately."
+    }
+  ]
+}

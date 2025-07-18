@@ -1,0 +1,39 @@
+{
+  "responses": [
+    {
+      "id": 1,
+      "title": "Reason for Seeking Help & Core Concerns",
+      "response": "What are the primary concerns bringing you to therapy at this time? I'm seeking help for overwhelming anxiety that feels constant and makes me overthink everything. It's really affecting my daily life. I also find myself getting angry very quickly and intensely, which I want to address. What specific challenges or difficulties are you experiencing as a result of these concerns? The anxiety leads to frequent panic episodes, and I constantly feel on edge. My quick temper often causes arguments with loved ones, and I regret my reactions later. I want to feel more in control of my emotions and stop these patterns."
+    },
+    {
+      "id": 2,
+      "title": "Treatment Goals & Desired Outcomes",
+      "response": "What are your main goals for treatment? My main goals are to significantly reduce my anxiety levels, especially the panic episodes, and to learn effective strategies to manage my anger. I want to feel calmer, more in control, and improve my relationships by reacting more constructively. How will you know when therapy has been successful for you? I'll know therapy is successful when I can handle stressful situations without feeling overwhelmed by anxiety, when my anger outbursts are rare or non-existent, and when I can communicate my feelings calmly instead of reacting impulsively."
+    },
+    {
+      "id": 3,
+      "title": "Emotional & Mood Symptoms",
+      "response": "Please select any of the following emotional or mood symptoms you have experienced recently: Feeling unusually irritable, angry, or on-edge (frequent and intense), Excessive worry or fear (about various situations), Difficulty coping with everyday inconveniences (leading to frustration or anger), Feeling restless or keyed up due to anxiety, Sudden, intense feelings of panic or dread. On a scale of 1-10 (1 being no impact, 10 being severe impact), how much do your anxiety and anger impact your daily functioning and relationships? Anxiety: 9, Anger: 8. When you experience anger, how do you typically express it? I tend to lash out verbally, sometimes yell, and then I often withdraw and feel guilty afterwards."
+    },
+    {
+      "id": 4,
+      "title": "Thought Patterns & Cognitive Symptoms",
+      "response": "Please select any of the following thought patterns or cognitive symptoms you have experienced recently: Recurrent intrusive, unwanted thoughts (often about worst-case scenarios), Constant overthinking or replaying conversations, Difficulty concentrating or focusing due to worrying, Catastrophic thinking (always expecting the worst outcome). Do you notice any specific thoughts or beliefs that often precede your feelings of anger? Yes, I often think 'this isn't fair' or 'they're deliberately trying to annoy me' before I get angry."
+    },
+    {
+      "id": 5,
+      "title": "Behavioral Responses",
+      "response": "Please select any of the following behavioral changes you have experienced recently: Avoiding certain activities or social situations due to fear or potential conflict, Changes in your academic or work performance (due to anxiety or difficulty focusing), Withdrawal from friends or family after angry outbursts, Restlessness or difficulty staying still. Are there specific situations or triggers that tend to bring on your anxiety or anger? Stressful work deadlines, social gatherings with new people, and feeling criticized or disrespected by others are big triggers for both."
+    },
+    {
+      "id": 6,
+      "title": "Physical Sensations & Sleep Patterns",
+      "response": "Please select any of the following physical symptoms you have experienced recently: Difficulty falling or staying asleep (due to racing thoughts), Changes in your energy level, such as feeling unusually fatigued or wired, Episodes of heart racing, difficulty breathing, and sweating (panic symptoms), Muscle tension, especially in neck and shoulders, Digestive issues (stomach upset, nausea) when anxious."
+    },
+    {
+      "id": 7,
+      "title": "Past Treatment & Coping Strategies",
+      "response": "Have you received any prior mental health treatment? If so, what was helpful and what was not? Cognitive Behavioral Therapy (CBT) helped in the past for anxiety, but I didn't stick with it long enough to tackle the anger. Medication like SSRIs reduced my anxiety, but I didn’t like the side effects. Mindfulness and breathing exercises haven’t been very effective for me, especially when anger is intense. What coping strategies, if any, do you currently use when you feel anxious or angry? When anxious, I sometimes try deep breathing, but it doesn't always work. When angry, I tend to isolate myself, which isn't always helpful in the long run."
+    }
+  ]
+}

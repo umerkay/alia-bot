@@ -33,6 +33,11 @@ class Settings:
     ENSEMBLE_VECTOR_WEIGHT = float(os.getenv("ENSEMBLE_VECTOR_WEIGHT", "0.6"))
     ENSEMBLE_BM25_WEIGHT = float(os.getenv("ENSEMBLE_BM25_WEIGHT", "0.4"))
     
+    # Neo4j configuration
+    NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
+    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "password")
+    
     @property
     def chroma_db_path(self) -> Path:
         """Get Chroma DB path as Path object"""
@@ -41,7 +46,12 @@ class Settings:
     @property
     def shared_docs_path(self) -> Path:
         """Get shared docs path as Path object"""
-        return Path(self.SHARED_DOCS_PATH)
+        path = Path(self.SHARED_DOCS_PATH)
+        if not path.is_absolute():
+            # Make it relative to the project root
+            project_root = Path(__file__).parent.parent
+            path = project_root / path
+        return path
     
     @property
     def bm25_index_path(self) -> Path:
