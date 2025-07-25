@@ -1,3 +1,88 @@
+
+## How the AI Agent Works
+
+This medical health chatbot uses an intelligent multi-agent architecture to provide comprehensive answers about patients by accessing and analyzing different data sources. Here's how it works:
+
+### 🏥 Patient Data Sources
+
+The system has access to four key types of patient data:
+
+- **📋 Assessments**: Measurement-based care assessments taken by patients that provide objective and self-reported insights into their mental health state
+- **🏥 EHR (Electronic Health Records)**: Complete medical history including diagnoses, medications, and family medical history
+- **📝 Intake Forms**: Patient responses to clinician-designed intake assessments (customizable per clinician)
+- **💬 Session Transcripts**: Detailed transcripts from therapy sessions showing therapeutic progress and interactions
+
+### 🤖 Multi-Agent Architecture
+
+The system uses a **hierarchical agent structure** with specialized agents for different data types:
+
+#### Main Clinical Agent (Orchestrator)
+- Acts as the central coordinator that receives clinician queries
+- Intelligently routes questions to appropriate specialized agents
+- Has access to all tools and can call multiple agents in a single response
+- Provides comprehensive, structured final answers
+
+#### Specialized Sub-Agents
+
+1. **📊 Assessment Agent**
+   - Specializes in analyzing measurement-based care assessments
+   - Interprets scores, trends, and clinical significance
+   - Tracks patient progress over time
+   - Provides context about assessment tools and clinical thresholds
+
+2. **💭 Transcript Agent**
+   - Focuses on therapy session analysis
+   - Retrieves and analyzes session content
+   - Provides insights into therapeutic progress
+   - Cites specific sessions and interactions
+
+3. **🏥 EHR Agent (Graph RAG)**
+   - Uses advanced graph database technology for structured medical data
+   - Handles three specific data types:
+     - `diagnoses`: Patient conditions and diseases
+     - `medications`: Current and past medications with dosages
+     - `family_history`: Relevant family medical history
+
+### 🔍 Smart Retrieval Technology
+
+The system uses two advanced retrieval methods:
+
+1. **Vector Search (Semantic RAG)**: For unstructured text data like transcripts, assessments, and intake forms
+   - Uses Google's Generative AI embeddings for semantic understanding
+   - Finds contextually relevant information even when exact keywords don't match
+
+2. **Graph RAG**: For structured EHR data
+   - Uses Neo4j graph database for complex medical relationships
+   - Enables precise queries about diagnoses, medications, and family history
+   - Maintains relationships between different medical entities
+
+### 🎯 Query Processing Flow
+
+1. **Query Reception**: Clinician asks a question about a patient
+2. **Intelligent Routing**: Main agent analyzes the query and determines which data sources are needed
+3. **Parallel Processing**: Multiple specialized agents can be called simultaneously
+4. **Data Retrieval**: Each agent uses its specialized retrieval tool to find relevant information
+5. **Integration**: Main agent synthesizes all retrieved information
+6. **Clinical Response**: Provides a comprehensive, structured answer with proper medical context
+
+### 💡 Key Features
+
+- **Context-Aware**: Maintains conversation history for follow-up questions
+- **Patient-Specific**: All queries are filtered by patient ID for data security
+- **Multi-Modal**: Can handle both structured (EHR) and unstructured (transcripts, assessments) data
+- **Real-Time**: Provides streaming responses with tool execution visibility
+- **Safety-First**: Only uses factual data, never hallucinates information
+
+### 🔧 Technical Implementation
+
+- **Framework**: LangChain + LangGraph for agent orchestration
+- **LLM**: Google Gemini 2.0 Flash for natural language processing
+- **Vector Database**: ChromaDB for semantic search
+- **Graph Database**: Neo4j for EHR relationship mapping
+- **Embeddings**: Google Generative AI embeddings for semantic understanding
+
+This architecture ensures that clinicians receive accurate, comprehensive, and contextually relevant information about their patients while maintaining strict data security and medical accuracy standards.
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
